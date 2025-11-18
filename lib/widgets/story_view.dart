@@ -478,12 +478,16 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       switch (playbackStatus) {
         case PlaybackState.play:
           _removeNextHold();
-          this._animationController?.forward();
+          if (mounted) {
+            this._animationController?.forward();
+          }
           break;
 
         case PlaybackState.pause:
           _holdNext(); // then pause animation
-          this._animationController?.stop(canceled: false);
+          if (mounted) {
+            this._animationController?.stop(canceled: false);
+          }
           break;
 
         case PlaybackState.next:
@@ -573,7 +577,9 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   }
 
   void _goBack() {
-    _animationController!.stop();
+    if (mounted) {
+      _animationController!.stop();
+    }
 
     if (this._currentStory == null) {
       widget.storyItems.last!.shown = false;
@@ -594,7 +600,9 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
   void _goForward() {
     if (this._currentStory != widget.storyItems.last) {
-      _animationController!.stop();
+      if (mounted) {
+        _animationController!.stop();
+      }
 
       // get last showing
       final _last = this._currentStory;
@@ -607,8 +615,10 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       }
     } else {
       // this is the last page, progress animation should skip to end
-      _animationController!
-          .animateTo(1.0, duration: Duration(milliseconds: 10));
+      if (mounted) {
+        _animationController!
+            .animateTo(1.0, duration: Duration(milliseconds: 10));
+      }
     }
   }
 
