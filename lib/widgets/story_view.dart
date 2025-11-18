@@ -479,6 +479,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       switch (playbackStatus) {
         case PlaybackState.unlock:
           isLocked = false;
+          break;
         case PlaybackState.play:
           if (isLocked) {
             break;
@@ -491,6 +492,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
         case PlaybackState.lock:
           isLocked = true;
+          break;
         case PlaybackState.pause:
           _holdNext(); // then pause animation
           if (mounted) {
