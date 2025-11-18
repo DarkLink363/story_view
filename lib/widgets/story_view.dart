@@ -440,6 +440,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   AnimationController? _animationController;
   Animation<double>? _currentAnimation;
   Timer? _nextDebouncer;
+  bool isLocked = false;
 
   StreamSubscription<PlaybackState>? _playbackSubscription;
 
@@ -476,13 +477,20 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
     this._playbackSubscription =
         widget.controller.playbackNotifier.listen((playbackStatus) {
       switch (playbackStatus) {
+        case PlaybackState.unlock:
+          isLocked = false;
         case PlaybackState.play:
+          if (isLocked) {
+            break;
+          }
           _removeNextHold();
           if (mounted) {
             this._animationController?.forward();
           }
           break;
 
+        case PlaybackState.lock:
+          isLocked = true;
         case PlaybackState.pause:
           _holdNext(); // then pause animation
           if (mounted) {
