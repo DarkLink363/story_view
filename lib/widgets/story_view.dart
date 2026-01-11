@@ -448,7 +448,8 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   Animation<double>? _currentAnimation;
   Timer? _nextDebouncer;
   bool isLocked = false;
-  double _speed = 1.0;
+  double _playbackSpeed = 1.0;
+  Duration? _playbackDuration = null;
 
   StreamSubscription<PlaybackState>? _playbackSubscription;
 
@@ -553,8 +554,13 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       widget.onStoryShow!(storyItem, storyItemIndex);
     }
 
-    _animationController =
-        AnimationController(duration: storyItem.duration, vsync: this);
+    _playbackDuration = storyItem.duration;
+
+    _animationController = AnimationController(
+        duration: Duration(
+            milliseconds:
+                (storyItem.duration.inMilliseconds / _playbackSpeed).toInt()),
+        vsync: this);
 
     _animationController!.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -655,23 +661,26 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
     _nextDebouncer = Timer(Duration(milliseconds: 500), () {});
   }
 
-  set speed(double value) {
-    _speed = value;
+  set playbackSpeed(double value) {
+    _playbackSpeed = value;
+    if (_playbackDuration == null) return;
     _animationController
-      ?..duration = Duration(milliseconds: (1000 / value).toInt())
+      ?..duration = Duration(
+          milliseconds:
+              (_playbackDuration!.inMilliseconds / _playbackSpeed).toInt())
       ..forward();
   }
 
   void normalSpeed() {
-    speed = 1.0;
+    playbackSpeed = 1.0;
   }
 
   void fastSpeed() {
-    speed = 1.5;
+    playbackSpeed = 1.5;
   }
 
   void fasterSpeed() {
-    speed = 2.0;
+    playbackSpeed = 2.0;
   }
 
   @override
