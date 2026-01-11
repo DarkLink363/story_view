@@ -452,6 +452,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   Duration? _playbackDuration = null;
 
   StreamSubscription<PlaybackState>? _playbackSubscription;
+  // StreamSubscription<double>? _playbackSpeedSubscription;
 
   VerticalDragInfo? verticalDragInfo;
 
@@ -664,6 +665,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   set playbackSpeed(double value) {
     _playbackSpeed = value;
     if (_playbackDuration == null) return;
+    widget.controller.playbackSpeedNotifier.add(value);
     _animationController
       ?..duration = Duration(
           milliseconds:
@@ -789,14 +791,22 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               width: 70,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  widget.controller.playbackSpeedNotifier.add(1.5);
+                },
                 onTapDown: (details) {
+                  // _holdNext(); // TODO:
                   fastSpeed();
                 },
                 onTapCancel: () {
                   normalSpeed();
                 },
                 onTapUp: (details) {
+                  // if (_nextDebouncer?.isActive == false) { // TODO:
                   normalSpeed();
+                  // } else {
+                  //   widget.controller.next();
+                  // }
                 },
               ),
             ),
