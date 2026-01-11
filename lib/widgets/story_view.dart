@@ -657,8 +657,9 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
   set speed(double value) {
     _speed = value;
-    _animationController?.duration =
-        Duration(milliseconds: (1000 / value).toInt());
+    _animationController
+      ?..duration = Duration(milliseconds: (1000 / value).toInt())
+      ..forward();
   }
 
   void normalSpeed() {
