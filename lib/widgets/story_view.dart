@@ -729,7 +729,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
             child: Padding(
               padding: const EdgeInsets.only(right: 70.0),
               child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
+                behavior: HitTestBehavior.translucent,
                 onTapDown: (details) {
                   print('[center] onTapDown');
                   widget.controller.pause();
