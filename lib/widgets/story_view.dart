@@ -723,12 +723,17 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 print('[center] onTapUp');
 
                 normalSpeed();
-                if (_nextDebouncer == null ||
-                    _nextDebouncer?.isActive == true) {
-                  widget.controller.next();
-                } else {
+                if (_nextDebouncer?.isActive == false) {
                   widget.controller.play();
+                } else {
+                  widget.controller.next();
                 }
+                // if (_nextDebouncer == null ||
+                //     _nextDebouncer?.isActive == true) {
+                //   widget.controller.next();
+                // } else {
+                //   widget.controller.play();
+                // }
 
                 // if debounce timed out (not active) then continue anim
                 // if (_nextDebouncer?.isActive == false) {
