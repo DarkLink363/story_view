@@ -700,20 +700,42 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               behavior: HitTestBehavior.opaque,
               onTapDown: (details) {
                 print('[center] onTapDown');
-                widget.controller.pause();
+                final screenWidth = MediaQuery.of(context).size.width;
+                if (details.globalPosition.dx >= screenWidth - 70) {
+                  _holdNext();
+                  fastSpeed();
+                } else {
+                  widget.controller.pause();
+                }
               },
               onTapCancel: () {
                 print('[center] onTapCancel');
-                widget.controller.play();
+
+                normalSpeed();
+                if (_nextDebouncer == null ||
+                    _nextDebouncer?.isActive == true) {
+                  widget.controller.next();
+                } else {
+                  widget.controller.play();
+                }
               },
               onTapUp: (details) {
                 print('[center] onTapUp');
-                // if debounce timed out (not active) then continue anim
-                if (_nextDebouncer?.isActive == false) {
-                  widget.controller.play();
-                } else {
+
+                normalSpeed();
+                if (_nextDebouncer == null ||
+                    _nextDebouncer?.isActive == true) {
                   widget.controller.next();
+                } else {
+                  widget.controller.play();
                 }
+
+                // if debounce timed out (not active) then continue anim
+                // if (_nextDebouncer?.isActive == false) {
+                //   widget.controller.play();
+                // } else {
+                //   widget.controller.next();
+                // }
               },
               onVerticalDragStart: widget.onVerticalSwipeComplete == null
                   ? null
@@ -793,49 +815,49 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            heightFactor: 1,
-            child: SizedBox(
-              width: 70,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                // onTap: () {
-                //   print('[right] onTap');
-                //   widget.controller.next();
-                // },
-                // onTap: () {
-                //   print('[right] onTap');
-                //   widget.controller.playbackSpeedNotifier.add(1.5);
-                // },
-                onTapDown: (details) {
-                  print('[right] onTapDown');
-                  _holdNext();
-                  fastSpeed();
-                },
-                onTapCancel: () {
-                  print('[right] onTapCancel');
-                  if (_nextDebouncer?.isActive == false) {
-                    normalSpeed();
-                  } else {
-                    widget.controller.next();
-                  }
-                },
-                onTapUp: (details) {
-                  print('[right] onTapUp');
-                  // if (_nextDebouncer?.isActive == false) { // TODO:
-                  if (_nextDebouncer?.isActive == false) {
-                    normalSpeed();
-                  } else {
-                    widget.controller.next();
-                  }
-                  // } else {
-                  //   widget.controller.next();
-                  // }
-                },
-              ),
-            ),
-          ),
+          // Align(
+          //   alignment: Alignment.centerRight,
+          //   heightFactor: 1,
+          //   child: SizedBox(
+          //     width: 70,
+          //     child: GestureDetector(
+          //       behavior: HitTestBehavior.translucent,
+          //       // onTap: () {
+          //       //   print('[right] onTap');
+          //       //   widget.controller.next();
+          //       // },
+          //       // onTap: () {
+          //       //   print('[right] onTap');
+          //       //   widget.controller.playbackSpeedNotifier.add(1.5);
+          //       // },
+          //       onTapDown: (details) {
+          //         print('[right] onTapDown');
+          //         _holdNext();
+          //         fastSpeed();
+          //       },
+          //       onTapCancel: () {
+          //         print('[right] onTapCancel');
+          //         if (_nextDebouncer?.isActive == false) {
+          //           normalSpeed();
+          //         } else {
+          //           widget.controller.next();
+          //         }
+          //       },
+          //       onTapUp: (details) {
+          //         print('[right] onTapUp');
+          //         // if (_nextDebouncer?.isActive == false) { // TODO:
+          //         if (_nextDebouncer?.isActive == false) {
+          //           normalSpeed();
+          //         } else {
+          //           widget.controller.next();
+          //         }
+          //         // } else {
+          //         //   widget.controller.next();
+          //         // }
+          //       },
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
