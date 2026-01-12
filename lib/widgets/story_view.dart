@@ -708,17 +708,17 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                   widget.controller.pause();
                 }
               },
-              onTapCancel: () {
-                print('[center] onTapCancel');
+              // onTapCancel: () {
+              //   print('[center] onTapCancel');
 
-                normalSpeed();
-                if (_nextDebouncer == null ||
-                    _nextDebouncer?.isActive == true) {
-                  widget.controller.next();
-                } else {
-                  widget.controller.play();
-                }
-              },
+              //   normalSpeed();
+              //   if (_nextDebouncer == null ||
+              //       _nextDebouncer?.isActive == true) {
+              //     widget.controller.next();
+              //   } else {
+              //     widget.controller.play();
+              //   }
+              // },
               onTapUp: (details) {
                 print('[center] onTapUp');
 
