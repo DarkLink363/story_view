@@ -737,18 +737,18 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 //   widget.controller.next();
                 // }
               },
-              onVerticalDragStart: widget.onVerticalSwipeComplete == null
-                  ? null
-                  : (details) {
-                      print('[center] onVerticalDragStart');
-                      widget.controller.pause();
-                    },
-              onVerticalDragCancel: widget.onVerticalSwipeComplete == null
-                  ? null
-                  : () {
-                      print('[center] onVerticalDragCancel');
-                      widget.controller.play();
-                    },
+              // onVerticalDragStart: widget.onVerticalSwipeComplete == null
+              //     ? null
+              //     : (details) {
+              //         print('[center] onVerticalDragStart');
+              //         widget.controller.pause();
+              //       },
+              // onVerticalDragCancel: widget.onVerticalSwipeComplete == null
+              //     ? null
+              //     : () {
+              //         print('[center] onVerticalDragCancel');
+              //         widget.controller.play();
+              //       },
               onVerticalDragUpdate: widget.onVerticalSwipeComplete == null
                   ? null
                   : (details) {
@@ -765,7 +765,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                   ? null
                   : (details) {
                       print('[center] onVerticalDragEnd');
-                      widget.controller.play();
+                      // widget.controller.play();
                       // finish up drag cycle
                       if (!verticalDragInfo!.cancel &&
                           widget.onVerticalSwipeComplete != null) {
