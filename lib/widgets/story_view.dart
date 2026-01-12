@@ -730,7 +730,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               padding: const EdgeInsets.only(right: 70.0),
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: () {},
                 onTapDown: (details) {
                   print('[center] onTapDown');
                   widget.controller.pause();
@@ -809,22 +808,26 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               width: 70,
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  print('[right] onTap');
-                  widget.controller.next();
-                },
+                // onTap: () {
+                //   print('[right] onTap');
+                //   widget.controller.next();
+                // },
                 // onTap: () {
                 //   print('[right] onTap');
                 //   widget.controller.playbackSpeedNotifier.add(1.5);
                 // },
                 onTapDown: (details) {
                   print('[right] onTapDown');
-                  // _holdNext(); // TODO:
+                  _holdNext();
                   fastSpeed();
                 },
                 onTapCancel: () {
                   print('[right] onTapCancel');
-                  normalSpeed();
+                  if (_nextDebouncer?.isActive == false) {
+                    normalSpeed();
+                  } else {
+                    widget.controller.next();
+                  }
                 },
                 onTapUp: (details) {
                   print('[right] onTapUp');
