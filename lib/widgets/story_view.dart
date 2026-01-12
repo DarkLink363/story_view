@@ -723,19 +723,22 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
             ),
           ),
           Align(
-            alignment: Alignment.centerRight,
+            alignment: Alignment.centerLeft,
             heightFactor: 1,
             child: Padding(
               padding: const EdgeInsets.only(right: 70.0),
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTapDown: (details) {
+                  print('[center] onTapDown');
                   widget.controller.pause();
                 },
                 onTapCancel: () {
+                  print('[center] onTapCancel');
                   widget.controller.play();
                 },
                 onTapUp: (details) {
+                  print('[center] onTapUp');
                   // if debounce timed out (not active) then continue anim
                   if (_nextDebouncer?.isActive == false) {
                     widget.controller.play();
@@ -801,16 +804,20 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () {
+                  print('[right] onTap');
                   widget.controller.playbackSpeedNotifier.add(1.5);
                 },
                 onTapDown: (details) {
+                  print('[right] onTapDown');
                   // _holdNext(); // TODO:
                   fastSpeed();
                 },
                 onTapCancel: () {
+                  print('[right] onTapCancel');
                   normalSpeed();
                 },
                 onTapUp: (details) {
+                  print('[right] onTapUp');
                   // if (_nextDebouncer?.isActive == false) { // TODO:
                   normalSpeed();
                   // } else {
