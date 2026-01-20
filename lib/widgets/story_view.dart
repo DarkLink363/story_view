@@ -447,6 +447,8 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   AnimationController? _animationController;
   Animation<double>? _currentAnimation;
   Timer? _nextDebouncer;
+  Timer? _previousDebouncer;
+  double? _pointerDownX;
   bool isLocked = false;
   double _playbackSpeed = 1.0;
   Duration? _playbackDuration = null;
@@ -662,6 +664,11 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
     _nextDebouncer = Timer(Duration(milliseconds: 500), () {});
   }
 
+  void _holdPrevious() {
+    _previousDebouncer?.cancel();
+    _previousDebouncer = Timer(Duration(milliseconds: 500), () {});
+  }
+
   set playbackSpeed(double value) {
     _playbackSpeed = value;
     if (_playbackDuration == null) return;
@@ -700,8 +707,12 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               behavior: HitTestBehavior.opaque,
               onPointerDown: (details) {
                 print('[center] onTapDown');
+                _pointerDownX = details.localPosition.dx;
                 final screenWidth = MediaQuery.of(context).size.width;
-                if (details.localPosition.dx >= screenWidth - 70) {
+                if (details.localPosition.dx <= 70) {
+                  _holdPrevious();
+                  widget.controller.pause();
+                } else if (details.localPosition.dx >= screenWidth - 70) {
                   _holdNext();
                   fastSpeed();
                 } else {
@@ -712,7 +723,19 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 print('[center] onTapUp');
 
                 normalSpeed();
-                if (_nextDebouncer?.isActive == false) {
+                final downX = _pointerDownX;
+                _pointerDownX = null;
+
+                if (downX != null &&
+                    downX <= 70 &&
+                    details.localPosition.dx <= 70) {
+                  // Tap w lewych 70px - previous (tylko jeśli to był tap, nie long press)
+                  if (_previousDebouncer?.isActive == true) {
+                    widget.controller.previous();
+                  } else {
+                    widget.controller.play();
+                  }
+                } else if (_nextDebouncer?.isActive == false) {
                   widget.controller.play();
                 } else {
                   widget.controller.next();
@@ -828,18 +851,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                     indicatorForegroundColor: widget.indicatorForegroundColor,
                   ),
                 ),
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
-            heightFactor: 1,
-            child: SizedBox(
-              width: 70,
-              child: GestureDetector(
-                onTap: () {
-                  widget.controller.previous();
-                },
               ),
             ),
           ),
