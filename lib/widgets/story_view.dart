@@ -518,6 +518,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
           break;
 
         case PlaybackState.previous:
+          _removePreviousHold();
           _removeNextHold();
           _goBack();
           break;
@@ -657,6 +658,11 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   void _removeNextHold() {
     _nextDebouncer?.cancel();
     _nextDebouncer = null;
+  }
+
+  void _removePreviousHold() {
+    _previousDebouncer?.cancel();
+    _previousDebouncer = null;
   }
 
   void _holdNext() {
@@ -854,49 +860,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               ),
             ),
           ),
-          // Align(
-          //   alignment: Alignment.centerRight,
-          //   heightFactor: 1,
-          //   child: SizedBox(
-          //     width: 70,
-          //     child: GestureDetector(
-          //       behavior: HitTestBehavior.translucent,
-          //       // onTap: () {
-          //       //   print('[right] onTap');
-          //       //   widget.controller.next();
-          //       // },
-          //       // onTap: () {
-          //       //   print('[right] onTap');
-          //       //   widget.controller.playbackSpeedNotifier.add(1.5);
-          //       // },
-          //       onTapDown: (details) {
-          //         print('[right] onTapDown');
-          //         _holdNext();
-          //         fastSpeed();
-          //       },
-          //       onTapCancel: () {
-          //         print('[right] onTapCancel');
-          //         if (_nextDebouncer?.isActive == false) {
-          //           normalSpeed();
-          //         } else {
-          //           widget.controller.next();
-          //         }
-          //       },
-          //       onTapUp: (details) {
-          //         print('[right] onTapUp');
-          //         // if (_nextDebouncer?.isActive == false) { // TODO:
-          //         if (_nextDebouncer?.isActive == false) {
-          //           normalSpeed();
-          //         } else {
-          //           widget.controller.next();
-          //         }
-          //         // } else {
-          //         //   widget.controller.next();
-          //         // }
-          //       },
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );
