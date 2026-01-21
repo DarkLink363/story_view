@@ -710,16 +710,14 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
           Align(
             alignment: Alignment.centerRight,
             heightFactor: 1,
-            child: Listener(
-              behavior: HitTestBehavior.opaque,
-              onPointerDown: (details) {
-                print('onPointerDown: ${details.localPosition.dy}');
+            child: GestureDetector(
+              behavior: HitTestBehavior
+                  .translucent, // Ważne: pozwala "przenikać" do TextFielda
 
+              // 1. Dotknięcie ekranu -> PAUZA (to się wykona zawsze, zanim system zdecyduje kto wygrał)
+              onTapDown: (details) {
                 final screenHeight = MediaQuery.of(context).size.height;
-
-                if (details.localPosition.dy >= screenHeight - 60) {
-                  return;
-                }
+                if (details.localPosition.dy >= screenHeight - 60) return;
 
                 _pointerDownX = details.localPosition.dx;
                 final screenWidth = MediaQuery.of(context).size.width;
@@ -731,10 +729,16 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                   _holdNext();
                   fastSpeed();
                 } else {
+                  // Tu jest klucz: pauzujemy od razu przy dotknięciu
                   widget.controller.pause();
                 }
               },
-              onPointerUp: (details) {
+
+              // 2. Puszczenie palca na "pustym" tle -> WZNOWIENIE / NAWIGACJA
+              onTapUp: (details) {
+                final screenHeight = MediaQuery.of(context).size.height;
+                if (details.localPosition.dy >= screenHeight - 60) return;
+
                 normalSpeed();
                 final downX = _pointerDownX;
                 _pointerDownX = null;
@@ -742,7 +746,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 if (downX != null &&
                     downX <= 70 &&
                     details.localPosition.dx <= 70) {
-                  // Tap w lewych 70px - previous (tylko jeśli to był tap, nie long press)
                   if (_previousDebouncer?.isActive == true) {
                     widget.controller.previous();
                   } else {
@@ -754,92 +757,42 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                   widget.controller.next();
                 }
               },
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                // onTapDown: (details) {
-                //   print('[center] onTapDown');
-                //   final screenWidth = MediaQuery.of(context).size.width;
-                //   if (details.globalPosition.dx >= screenWidth - 70) {
-                //     _holdNext();
-                //     fastSpeed();
-                //   } else {
-                //     widget.controller.pause();
-                //   }
-                // },
-                // // onTapCancel: () {
-                // //   print('[center] onTapCancel');
 
-                // //   normalSpeed();
-                // //   if (_nextDebouncer == null ||
-                // //       _nextDebouncer?.isActive == true) {
-                // //     widget.controller.next();
-                // //   } else {
-                // //     widget.controller.play();
-                // //   }
-                // // },
-                // onTapUp: (details) {
-                //   print('[center] onTapUp');
+              // 3. ZMIANA TUTAJ: Gdy TextField (lub przycisk) przejmie gest
+              onTapCancel: () {
+                print('Gesture Cancelled - Child (Input/Button) took over');
 
-                //   normalSpeed();
-                //   if (_nextDebouncer?.isActive == false) {
-                //     widget.controller.play();
-                //   } else {
-                //     widget.controller.next();
-                //   }
-                //   // if (_nextDebouncer == null ||
-                //   //     _nextDebouncer?.isActive == true) {
-                //   //   widget.controller.next();
-                //   // } else {
-                //   //   widget.controller.play();
-                //   // }
+                // Sprzątamy stan wewnętrzny
+                normalSpeed();
+                _removeNextHold();
+                _removePreviousHold();
+                _pointerDownX = null;
 
-                //   // if debounce timed out (not active) then continue anim
-                //   // if (_nextDebouncer?.isActive == false) {
-                //   //   widget.controller.play();
-                //   // } else {
-                //   //   widget.controller.next();
-                //   // }
-                // },
-                // onVerticalDragStart: widget.onVerticalSwipeComplete == null
-                //     ? null
-                //     : (details) {
-                //         print('[center] onVerticalDragStart');
-                //         widget.controller.pause();
-                //       },
-                // onVerticalDragCancel: widget.onVerticalSwipeComplete == null
-                //     ? null
-                //     : () {
-                //         print('[center] onVerticalDragCancel');
-                //         widget.controller.play();
-                //       },
-                onVerticalDragUpdate: widget.onVerticalSwipeComplete == null
-                    ? null
-                    : (details) {
-                        print('[center] onVerticalDragUpdate');
-                        if (verticalDragInfo == null) {
-                          verticalDragInfo = VerticalDragInfo();
-                        }
+                // USUNĘLIŚMY widget.controller.play();
+                // Efekt: Story pozostaje w stanie PAUSE (ustawionym w onTapDown).
+                // Użytkownik może pisać w spokoju.
+              },
 
-                        verticalDragInfo!.update(details.primaryDelta!);
-
-                        // TODO: provide callback interface for animation purposes
-                      },
-                onVerticalDragEnd: widget.onVerticalSwipeComplete == null
-                    ? null
-                    : (details) {
-                        print('[center] onVerticalDragEnd');
-                        // widget.controller.play();
-                        // finish up drag cycle
-                        if (!verticalDragInfo!.cancel &&
-                            widget.onVerticalSwipeComplete != null) {
-                          widget.onVerticalSwipeComplete!(
-                              verticalDragInfo!.direction);
-                        }
-
-                        verticalDragInfo = null;
-                      },
-                child: _currentView,
-              ),
+              // Reszta bez zmian (obsługa swipe)
+              onVerticalDragUpdate: widget.onVerticalSwipeComplete == null
+                  ? null
+                  : (details) {
+                      if (verticalDragInfo == null) {
+                        verticalDragInfo = VerticalDragInfo();
+                      }
+                      verticalDragInfo!.update(details.primaryDelta!);
+                    },
+              onVerticalDragEnd: widget.onVerticalSwipeComplete == null
+                  ? null
+                  : (details) {
+                      if (!verticalDragInfo!.cancel &&
+                          widget.onVerticalSwipeComplete != null) {
+                        widget.onVerticalSwipeComplete!(
+                            verticalDragInfo!.direction);
+                      }
+                      verticalDragInfo = null;
+                    },
+              child: _currentView,
             ),
           ),
           Visibility(
