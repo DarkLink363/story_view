@@ -713,6 +713,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
             child: Listener(
               behavior: HitTestBehavior.opaque,
               onPointerDown: (details) {
+                print('onPointerDown: ${details.localPosition.dy}');
                 _pointerDownX = details.localPosition.dx;
                 final screenWidth = MediaQuery.of(context).size.width;
                 if (details.localPosition.dx <= 70) {
