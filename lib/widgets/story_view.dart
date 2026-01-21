@@ -717,7 +717,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
                 final screenHeight = MediaQuery.of(context).size.height;
 
-                if (details.localPosition.dx >= screenHeight - 60) {
+                if (details.localPosition.dy >= screenHeight - 60) {
                   return;
                 }
 
