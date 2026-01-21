@@ -718,7 +718,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 if (details.localPosition.dx <= 70) {
                   print('[center] onTapDown - prev');
                   _holdPrevious();
-                  widget.controller.pause();
+                  // widget.controller.pause();
                 } else if (details.localPosition.dx >= screenWidth - 70) {
                   print('[center] onTapDown - next');
                   _holdNext();
