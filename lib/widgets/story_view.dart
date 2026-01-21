@@ -716,12 +716,15 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 _pointerDownX = details.localPosition.dx;
                 final screenWidth = MediaQuery.of(context).size.width;
                 if (details.localPosition.dx <= 70) {
+                  print('[center] onTapDown - prev');
                   _holdPrevious();
                   widget.controller.pause();
                 } else if (details.localPosition.dx >= screenWidth - 70) {
+                  print('[center] onTapDown - next');
                   _holdNext();
                   fastSpeed();
                 } else {
+                  print('[center] onTapDown - pause');
                   widget.controller.pause();
                 }
               },
@@ -737,13 +740,17 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                     details.localPosition.dx <= 70) {
                   // Tap w lewych 70px - previous (tylko jeśli to był tap, nie long press)
                   if (_previousDebouncer?.isActive == true) {
+                    print('[center] onTapDown - prev');
                     widget.controller.previous();
                   } else {
+                    print('[center] onTapDown - play');
                     widget.controller.play();
                   }
                 } else if (_nextDebouncer?.isActive == false) {
+                  print('[center] onTapDown - play2');
                   widget.controller.play();
                 } else {
+                  print('[center] onTapDown - next');
                   widget.controller.next();
                 }
               },
