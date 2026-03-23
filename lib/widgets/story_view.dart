@@ -785,7 +785,8 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               onVerticalDragEnd: widget.onVerticalSwipeComplete == null
                   ? null
                   : (details) {
-                      if (!verticalDragInfo!.cancel &&
+                      if (verticalDragInfo != null &&
+                          !verticalDragInfo!.cancel &&
                           widget.onVerticalSwipeComplete != null) {
                         widget.onVerticalSwipeComplete!(
                             verticalDragInfo!.direction);
