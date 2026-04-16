@@ -32,12 +32,19 @@ class StoryItem {
   /// story item.
   bool shown;
 
+  /// When true, the AnimationController's completed status will NOT trigger
+  /// story advancement. Instead, the video widget is expected to call
+  /// [StoryController.videoFinished()] when playback ends. This allows
+  /// BetterPlayer (or any video player) to act as the master clock.
+  final bool isVideoSlide;
+
   /// The page content
   final Widget view;
   StoryItem(
     this.view, {
     required this.duration,
     this.shown = false,
+    this.isVideoSlide = false,
   });
 
   /// Short hand to create text-only page.
@@ -454,6 +461,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   Duration? _playbackDuration = null;
 
   StreamSubscription<PlaybackState>? _playbackSubscription;
+  StreamSubscription<double>? _animationSyncSubscription;
   // StreamSubscription<double>? _playbackSpeedSubscription;
 
   VerticalDragInfo? verticalDragInfo;
@@ -523,6 +531,31 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
           _removeNextHold();
           _goBack();
           break;
+
+        case PlaybackState.videoFinished:
+          final current = _currentStory;
+          if (current != null && mounted) {
+            _animationController?.value = 1.0;
+            current.shown = true;
+            if (widget.storyItems.last != current) {
+              _beginPlay();
+            } else {
+              _onComplete();
+            }
+          }
+          break;
+      }
+    });
+
+    _animationSyncSubscription =
+        widget.controller.animationNotifier.listen((value) {
+      if (_currentStory?.isVideoSlide == true &&
+          _animationController != null &&
+          mounted) {
+        final uiPercent = _animationController!.value;
+        if ((value - uiPercent).abs() > 0.05) {
+          _animationController!.value = value;
+        }
       }
     });
 
@@ -535,6 +568,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
     _animationController?.dispose();
     _playbackSubscription?.cancel();
+    _animationSyncSubscription?.cancel();
 
     super.dispose();
   }
@@ -569,6 +603,10 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
     _animationController!.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
+        // For video slides, advancement is triggered by videoFinished() from
+        // the video widget (BetterPlayer). The timer-based completion here
+        // would fire before or independently of the actual video end.
+        if (storyItem.isVideoSlide) return;
         storyItem.shown = true;
         if (widget.storyItems.last != storyItem) {
           _beginPlay();

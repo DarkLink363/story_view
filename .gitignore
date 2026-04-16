@@ -73,3 +73,5 @@ build/
 main.dart
 .flutter-plugins-dependencies
 /sample/
+
+lib/widgets/story_view copy.dart.bck
