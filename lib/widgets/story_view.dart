@@ -682,9 +682,19 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       }
     } else {
       // this is the last page, progress animation should skip to end
+      final last = widget.storyItems.last!;
       if (mounted) {
-        _animationController!
-            .animateTo(1.0, duration: Duration(milliseconds: 10));
+        // For video slides the statusListener ignores `completed`, so
+        // animateTo(1.0) would not call _onComplete. Handle it explicitly.
+        if (last.isVideoSlide) {
+          _animationController?.stop();
+          _animationController?.value = 1.0;
+          last.shown = true;
+          _onComplete();
+        } else {
+          _animationController!
+              .animateTo(1.0, duration: Duration(milliseconds: 10));
+        }
       }
     }
   }
