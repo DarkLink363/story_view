@@ -18,43 +18,58 @@ class StoryController {
 
   /// Notify listeners with a [PlaybackState.pause] state
   void pause() {
-    playbackNotifier.add(PlaybackState.pause);
+    _addPlayback(PlaybackState.pause);
   }
 
   /// Notify listeners with a [PlaybackState.lock] state
   void lock() {
-    playbackNotifier.add(PlaybackState.lock);
+    _addPlayback(PlaybackState.lock);
   }
 
   /// Notify listeners with a [PlaybackState.unlock] state
   void unlock() {
-    playbackNotifier.add(PlaybackState.unlock);
+    _addPlayback(PlaybackState.unlock);
   }
 
   /// Notify listeners with a [PlaybackState.play] state
   void play() {
-    playbackNotifier.add(PlaybackState.play);
+    _addPlayback(PlaybackState.play);
   }
 
   void next() {
-    playbackNotifier.add(PlaybackState.next);
+    _addPlayback(PlaybackState.next);
   }
 
   void previous() {
-    playbackNotifier.add(PlaybackState.previous);
+    _addPlayback(PlaybackState.previous);
   }
 
   /// Notify that the video has finished playing. This replaces the timer-based
   /// AnimationController completion for video slides.
   void videoFinished() {
-    playbackNotifier.add(PlaybackState.videoFinished);
+    _addPlayback(PlaybackState.videoFinished);
   }
 
   /// Push an animation progress value (0.0 to 1.0) for drift correction.
   /// Only values that differ significantly from the current UI value will
   /// be applied (handled in StoryViewState).
   void syncAnimation(double value) {
+    if (animationNotifier.isClosed) return;
     animationNotifier.add(value);
+  }
+
+  /// Ustawia prędkość odtwarzania; po [dispose] nic nie robi.
+  void setPlaybackSpeed(double value) {
+    if (playbackSpeedNotifier.isClosed) return;
+    playbackSpeedNotifier.add(value);
+  }
+
+  /// Gesty i timery widgetu mogą odpalić się już po [dispose] kontrolera
+  /// (np. tapnięcie w trakcie zamykania stories). Dodanie zdarzenia do
+  /// zamkniętego strumienia rzucało wtedy `StateError`.
+  void _addPlayback(PlaybackState state) {
+    if (playbackNotifier.isClosed) return;
+    playbackNotifier.add(state);
   }
 
   /// Remember to call dispose when the story screen is disposed to close

@@ -727,7 +727,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   set playbackSpeed(double value) {
     _playbackSpeed = value;
     if (_playbackDuration == null) return;
-    widget.controller.playbackSpeedNotifier.add(value);
+    widget.controller.setPlaybackSpeed(value);
     print('setting playbackSpeed: $value');
     _animationController?.duration = Duration(
         milliseconds:
